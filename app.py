@@ -4,28 +4,20 @@ import time
 import os
 import streamlit.components.v1 as components
 
-# إعداد الصفحة وتزيينها
-st.set_page_config(page_title="لعبة النرد 3D الملونة", page_icon="🎲", layout="centered")
+# إعداد الصفحة
+st.set_page_config(page_title="لعبة النرد 3D التفاعلية", page_icon="🎲", layout="centered")
 
-# 🌟 تغيير لون الشاشة كاملة للون سومو فاتح (Sumo Light) وتعديل لون النصوص للون داكن باش تبان واضحة
+# تغيير لون الشاشة للون سومو فاتح
 st.markdown("""
     <style>
-        .stApp {
-            background-color: #FAEDCD !important; /* لون سومو فاتح وهادئ */
-        }
-        h1, h2, h3, p, label, .stMarkdown {
-            color: #3D3025 !important; /* لون بني داكن متناسق مع السومو ومريح للعين */
-        }
-        .stTextInput input {
-            background-color: #FFFFFF !important;
-            color: #3D3025 !important;
-            border: 2px solid #D4A373 !important;
-        }
+        .stApp { background-color: #FAEDCD !important; }
+        h1, h3, p, label, .stMarkdown { color: #3D3025 !important; }
+        .stTextInput input { background-color: #FFFFFF !important; color: #3D3025 !important; border: 2px solid #D4A373 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🎲 تحدي لعبة النرد 3D الملونة!")
-st.write("أنا مبرمج وعندي 10 سنوات، صاوبت هاد النرد 3D الملون باش نتحداكم!")
+st.title("🎲 تحدي لعبة النرد 3D التفاعلية!")
+st.write("✨ **ميزة جديدة:** اضغط ديريكت على النرد وسط المربع باش يدور ويتبدل! 👋")
 
 LEADERBOARD_FILE = "leaderboard.txt"
 
@@ -49,81 +41,61 @@ def حفظ_متصدر_جديد(name, score):
         for n, s in scores:
             f.write(f"{n},{s}\n")
 
-# خانة لتسجيل اسم اللاعب
+# إعداد الذاكرة
+if 'عدد_التدويرات' not in st.session_state: st.session_state.عدد_التدويرات = 0
+if 'مجموع_النقاط' not in st.session_state: st.session_state.مجموع_النقاط = 0
+
 اسم_اللاعب = st.text_input("اكتب سميتك هنا أولاً لتسجيل نقاطك:", value="آدم البطل")
 
-if 'عدد_التدويرات' not in st.session_state:
-    st.session_state.عدد_التدويرات = 0
-if 'مجموع_النقاط' not in st.session_state:
-    st.session_state.مجموع_النقاط = 0
-if 'الرقم_الحالي' not in st.session_state:
-    st.session_state.الرقم_الحالي = 1
-if 'دور_النرد' not in st.session_state:
-    st.session_state.دور_النرد = False
-
-col1, col2 = st.columns(2)
-
-with col1:
-    if st.button("🎲 ارمي النرد 3D الملون! 🎲"):
+# استقبال النتيجة من كود الـ JavaScript فاش كيتضغط على النرد
+query_params = st.query_params
+if "dice_result" in query_params:
+    res = int(query_params["dice_result"])
+    # التأكد أن النتيجة جديدة باش ما تبقاش تعاود مع الـ Refresh
+    if "last_total" not in st.session_state or query_params.get("roll_id") != st.session_state.get("last_roll_id"):
         st.session_state.عدد_التدويرات += 1
-        st.session_state.الرقم_الحالي = random.randint(1, 6)
-        st.session_state.مجموع_النقاط += st.session_state.الرقم_الحالي
-        st.session_state.دور_النرد = True
+        st.session_state.مجموع_النقاط += res
+        st.session_state.last_roll_id = query_params.get("roll_id")
+        st.session_state.الرقم_الأخير = res
 
-with col2:
-    if st.button("💾 حفظ نتيجتي فلوحة المتصدرين"):
-        if st.session_state.مجموع_النقاط > 0:
-            حفظ_متصدر_جديد(اسم_اللاعب, st.session_state.مجموع_النقاط)
-            st.toast(f"✅ تم حفظ نقاطك بنجاح يا {اسم_اللاعب}!")
-            st.session_state.عدد_التدويرات = 0
-            st.session_state.مجموع_النقاط = 0
-            st.session_state.دور_النرد = False
-        else:
-            st.warning("خاصك تلعب وترمي النرد أولاً! 🎲")
+# زر الحفظ في لوحة المتصدرين
+if st.button("💾 حفظ نتيجتي فلوحة المتصدرين"):
+    if st.session_state.مجموع_النقاط > 0:
+        حفظ_متصدر_جديد(اسم_اللاعب, st.session_state.مجموع_النقاط)
+        st.toast(f"✅ تم حفظ نقاطك بنجاح يا {اسم_اللاعب}!")
+        st.session_state.عدد_التدويرات = 0
+        st.session_state.مجموع_النقاط = 0
+        if "الرقم_الأخير" in st.session_state: del st.session_state.الرقم_الأخير
+    else:
+        st.warning("خاصك تضغط على النرد وتلعب أولاً! 🎲")
 
-# --- 🎮 كود الـ 3D الملون مع خلفية متناسقة ---
-زوايا_النرد = {
-    1: "rotateX(0deg) rotateY(0deg)",
-    2: "rotateX(-90deg) rotateY(0deg)",
-    3: "rotateX(0deg) rotateY(90deg)",
-    4: "rotateX(0deg) rotateY(-90deg)",
-    5: "rotateX(90deg) rotateY(0deg)",
-    6: "rotateX(180deg) rotateY(0deg)"
-}
-
-الزاوية_المستهدفة = زوايا_النرد[st.session_state.الرقم_الحالي]
-
+# --- 🎮 كود الـ 3D التفاعلي بالضغط المباشر ---
+# كود HTML و JavaScript كيعتمد على الضغط ديريكت وكيرسل النتيجة لـ Streamlit
+roll_id = random.randint(1000, 9999)
 html_code = f"""
-<div style="display: flex; justify-content: center; align-items: center; height: 220px; background: #3D3025; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.15);">
+<div style="display: flex; justify-content: center; align-items: center; height: 220px; background: #3D3025; border-radius: 15px; cursor: pointer;" onclick="rollDice()">
     <style>
         .scene {{ width: 100px; height: 100px; perspective: 400px; }}
         .cube {{
             width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
-            transform: {الزاوية_المستهدفة};
-            {f"animation: roll 1.2s ease-out forwards;" if st.session_state.دور_النرد else ""}
+            transition: transform 1s ease-out;
+            transform: rotateX(0deg) rotateY(0deg);
         }}
         .face {{
             position: absolute; width: 100px; height: 100px; border: 2px solid #fff;
             border-radius: 12px; font-size: 55px; font-weight: bold; display: flex;
             justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
         }}
-        
         .front  {{ transform: rotateY(  0deg) translateZ(50px); background: #ff4b4b; }}
         .bottom {{ transform: rotateX(-90deg) translateZ(50px); background: #3b82f6; }}
         .right  {{ transform: rotateY( 90deg) translateZ(50px); background: #10b981; }}
         .left   {{ transform: rotateY(-90deg) translateZ(50px); background: #f59e0b; }}
         .top    {{ transform: rotateX( 90deg) translateZ(50px); background: #8b5cf6; }}
         .back   {{ transform: rotateY(180deg) translateZ(50px); background: #d97706; }}
-        
-        @keyframes roll {{
-            0% {{ transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }}
-            30% {{ transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }}
-            60% {{ transform: rotateX(720deg) rotateY(540deg) rotateZ(180deg); }}
-            100% {{ transform: {الزاوية_المستهدفة}; }}
-        }}
     </style>
+    
     <div class="scene">
-        <div class="cube">
+        <div class="cube" id="dice">
             <div class="face front">⚀</div>
             <div class="face bottom">⚁</div>
             <div class="face right">⚂</div>
@@ -132,23 +104,55 @@ html_code = f"""
             <div class="face back">⚅</div>
         </div>
     </div>
+
+    <script>
+        function rollDice() {{
+            const cube = document.getElementById('dice');
+            const result = Math.floor(Math.random() * 6) + 1;
+            
+            // زوايا عشوائية قوية للحركة 3D
+            const xRand = (Math.floor(Math.random() * 3) + 4) * 360;
+            const yRand = (Math.floor(Math.random() * 3) + 4) * 360;
+            
+            const زوايا = {{
+                1: `rotateX(${{xRand}}deg) rotateY(${{yRand}}deg)`,
+                2: `rotateX(${{xRand - 90}}deg) rotateY(${{yRand}}deg)`,
+                3: `rotateX(${{xRand}}deg) rotateY(${{yRand + 90}}deg)`,
+                4: `rotateX(${{xRand}}deg) rotateY(${{yRand - 90}}deg)`,
+                5: `rotateX(${{xRand + 90}}deg) rotateY(${{yRand}}deg)`,
+                6: `rotateX(${{xRand + 180}}deg) rotateY(${{yRand}}deg)`
+            }};
+            
+            cube.style.transform = زوايا[result];
+            
+            // إرسال النتيجة لـ Streamlit بعد ما تسالي الحركة
+            setTimeout(() => {{
+                window.parent.postMessage({{
+                    type: 'streamlit:set_query_params',
+                    value: {{ dice_result: result, roll_id: '{roll_id}' }}
+                }}, '*');
+                // إعادة تحميل الصفحة لتحديث السكور في بايثون
+                window.parent.location.reload();
+            }}, 1000);
+        }}
+    </script>
 </div>
 """
 
 components.html(html_code, height=230)
 
-if st.session_state.دور_النرد:
-    st.success(f"🎉 النرد الملون وقف وجاب ليك الرقم: {st.session_state.الرقم_الحالي}")
+# عرض النتيجة
+if "الرقم_الأخير" in st.session_state:
+    st.success(f"🎉 جالي الرقم: {st.session_state.الرقم_الأخير}")
     if st.session_state.عدد_التدويرات % 5 == 0:
         st.balloons()
-        st.markdown('<div style="background-color: #FFFFFF; padding: 15px; border-radius: 15px; border-left: 5px solid #E1306C; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05);"><p style="font-size: 14px; margin: 0; color: #333 !important;">📸 تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p><a href="https://instagram.com" target="_blank" style="background-color: #E1306C; color: white !important; padding: 5px 10px; text-decoration: none; border-radius: 15px; font-size: 12px; display: inline-block; margin-top: 5px;">اضغط للمتابعة</a></div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #FFFFFF; padding: 15px; border-radius: 15px; border-left: 5px solid #E1306C; text-align: center;"><p style="font-size: 14px; margin: 0; color:#333;">📸 تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p><a href="https://instagram.com" target="_blank" style="background-color: #E1306C; color: white !important; padding: 5px 10px; text-decoration: none; border-radius: 15px; font-size: 12px; display: inline-block; margin-top: 5px;">اضغط للمتابعة</a></div>', unsafe_allow_html=True)
 
 st.subheader(f"📊 حصيلتك الحالية: {st.session_state.مجموع_النقاط} نقطة (في {st.session_state.عدد_التدويرات} رمية)")
 
 st.markdown("---")
-st.markdown("### 🏆 لوحة المتصدرين العالمية (أعلى مجموع نقاط) 🏆")
+st.markdown("### 🏆 لوحة المتصدرين العالمية 🏆")
 المتصدرون = قراءة_المتصدرين()
-
 if المتصدرون:
     for i, (الاسم, النقط) in enumerate(المتصدرون):
         ميدالية = {0: "🥇", 1: "🥈", 2: "🥉"}.get(i, "👤")
