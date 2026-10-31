@@ -1,7 +1,6 @@
 import streamlit as st
 import random
 import time
-import os
 import streamlit.components.v1 as components
 
 # إعداد الصفحة
@@ -17,35 +16,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🎲 تحدي لعبة النرد 3D التفاعلية!")
-st.write("✨ **ميزة جديدة:** اضغط ديريكت على النرد وسط المربع الكبير باش يدور ويتبدل! 👋")
+st.write("✨ اضغط ديريكت على النرد وسط المربع الكبير باش يدور ويتبدل!")
 
-LEADERBOARD_FILE = "leaderboard.txt"
-
-def قراءة_المتصدرين():
-    scores = []
-    if os.path.exists(LEADERBOARD_FILE):
-        with open(LEADERBOARD_FILE, "r", encoding="utf-8") as f:
-            for line in f:
-                if "," in line:
-                    name, score = line.strip().split(",")
-                    scores.append((name, int(score)))
-    scores.sort(key=lambda x: x, reverse=True)
-    return scores[:5]
-
-def حفظ_متصدر_جديد(name, score):
-    scores = قراءة_المتصدرين()
-    scores.append((name, score))
-    scores.sort(key=lambda x: x, reverse=True)
-    scores = scores[:5]
-    with open(LEADERBOARD_FILE, "w", encoding="utf-8") as f:
-        for n, s in scores:
-            f.write(f"{n},{s}\n")
-
-# إعداد الذاكرة
+# إعداد الذاكرة لحساب الجولة الحالية فقط
 if 'عدد_التدويرات' not in st.session_state: st.session_state.عدد_التدويرات = 0
 if 'مجموع_النقاط' not in st.session_state: st.session_state.مجموع_النقاط = 0
 
-اسم_اللاعب = st.text_input("اكتب سميتك هنا أولاً لتسجيل نقاطك:", value="آدم البطل")
+اسم_اللاعب = st.text_input("اكتب سميتك هنا أولاً:", value="آدم البطل")
 
 # استقبال النتيجة من كود الـ JavaScript فاش كيتضغط على النرد
 query_params = st.query_params
@@ -57,19 +34,14 @@ if "dice_result" in query_params:
         st.session_state.last_roll_id = query_params.get("roll_id")
         st.session_state.الرقم_الأخير = res
 
-# زر الحفظ في لوحة المتصدرين
-if st.button("💾 حفظ نتيجتي فلوحة المتصدرين"):
-    if st.session_state.مجموع_النقاط > 0:
-        حفظ_متصدر_جديد(اسم_اللاعب, st.session_state.مجموع_النقاط)
-        st.toast(f"✅ تم حفظ نقاطك بنجاح يا {اسم_اللاعب}!")
-        st.session_state.عدد_التدويرات = 0
-        st.session_state.مجموع_النقاط = 0
-        if "الرقم_الأخير" in st.session_state: del st.session_state.الرقم_الأخير
-    else:
-        st.warning("خاصك تضغط على النرد وتلعب أولاً! 🎲")
+# زر صغير لإعادة تصفير العداد الحالي إذا بغيتي تبدا من جديد
+if st.button("🔄 إعادة تصفير النقاط"):
+    st.session_state.عدد_التدويرات = 0
+    st.session_state.مجموع_النقاط = 0
+    if "الرقم_الأخير" in st.session_state: del st.session_state.الرقم_الأخير
+    st.rerun()
 
-# --- 🎮 كود الـ 3D التفاعلي بالإطار الكبير واللون الجديد ---
-# زدت فالعلو لـ 320px وبدلت لون الخلفية للون بني شوكولاتة داكن ودافئ (#4E3629) وكبرت المساحة الداخلية لراحة النرد
+# --- 🎮 كود الـ 3D التفاعلي بالإطار الكبير واللون البني ---
 roll_id = random.randint(1000, 9999)
 html_code = f"""
 <div style="display: flex; justify-content: center; align-items: center; height: 320px; background: #4E3629; border-radius: 20px; cursor: pointer; box-shadow: 0 12px 24px rgba(0,0,0,0.25);" onclick="rollDice()">
@@ -135,10 +107,9 @@ html_code = f"""
 </div>
 """
 
-# زدت فالعلو ديال الـ component باش يتناسب مع حجم الإطار الجديد
 components.html(html_code, height=335)
 
-# عرض النتيجة
+# عرض النتيجة والتشجيعات الحالية
 if "الرقم_الأخير" in st.session_state:
     st.success(f"🎉 جالي الرقم: {st.session_state.الرقم_الأخير}")
     if st.session_state.عدد_التدويرات % 5 == 0:
@@ -146,13 +117,3 @@ if "الرقم_الأخير" in st.session_state:
         st.markdown('<div style="background-color: #FFFFFF; padding: 15px; border-radius: 15px; border-left: 5px solid #E1306C; text-align: center;"><p style="font-size: 14px; margin: 0; color:#333;">📸 تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p><a href="https://instagram.com" target="_blank" style="background-color: #E1306C; color: white !important; padding: 5px 10px; text-decoration: none; border-radius: 15px; font-size: 12px; display: inline-block; margin-top: 5px;">اضغط للمتابعة</a></div>', unsafe_allow_html=True)
 
 st.subheader(f"📊 حصيلتك الحالية: {st.session_state.مجموع_النقاط} نقطة (في {st.session_state.عدد_التدويرات} رمية)")
-
-st.markdown("---")
-st.markdown("### 🏆 لوحة المتصدرين العالمية 🏆")
-المتصدرون = قراءة_المتصدرين()
-if المتصدرون:
-    for i, (الاسم, النقط) in enumerate(المتصدرون):
-        ميدالية = {0: "🥇", 1: "🥈", 2: "🥉"}.get(i, "👤")
-        st.markdown(f"**{ميدالية} المركز {i+1}:** {الاسم} — ✨ **{النقط} نقطة**")
-else:
-    st.write("اللائحة فارغة دابا، سجل نتيجتك!")
