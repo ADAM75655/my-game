@@ -2,12 +2,12 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # إعداد الصفحة
-st.set_page_config(page_title="لعبة النرد 3D السريعة", page_icon="🎲", layout="centered")
+st.set_page_config(page_title="لعبة القتال والمهام", page_icon="⚔️", layout="centered")
 
 # معرف حساب Start.io الحقيقي ديال آدم
 STARTIO_ACCOUNT_ID = "124299136"
 
-# تغيير لون الشاشة للون سومو فاتح
+# تغيير لون الشاشة للون سومو فاتح وهادئ
 st.markdown("""
     <style>
         .stApp { background-color: #FAEDCD !important; }
@@ -15,111 +15,179 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🎲 تحدي لعبة النرد 3D التفاعلية السريعة!")
-st.write("✨ **تحديث جديد:** تم حذف الـ Actualiser! اضغط على النرد دابا وسير كيطير 🚀")
+st.title("⚔️ لعبة ملاحم الأبطال: قتال ومهام! ⚔️")
+st.write("✨ **تحديث جديد:** اضغط على أزرار الهجوم لضرب الوحوش، كمل المهام، واجمع الذهب! 🚀")
 
-# كود HTML + CSS + JS كامل مكمول باش يتحسب كلشي فالبلاصة بلا ريفريش
+# كود اللعبة كامل بـ HTML + CSS + JS باش تخدم اللعبة خفيفة وبلا ريفريش للصفحة
 html_code = f"""
-<div style="font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #FAEDCD; padding: 10px; border-radius: 15px;">
+<div style="font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; background: #FAEDCD; padding: 10px; border-radius: 15px; direction: rtl;">
     
-    <!-- 🎮 إطار النرد البني الكبير -->
-    <div style="display: flex; justify-content: center; align-items: center; width: 100%; max-width: 450px; height: 280px; background: #4E3629; border-radius: 20px; cursor: pointer; box-shadow: 0 12px 24px rgba(0,0,0,0.25);" onclick="rollDice()">
-        <div style="width: 140px; height: 140px; perspective: 600px;">
-            <div id="dice" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.8s ease-out; transform: rotateX(0deg) rotateY(0deg);">
-                <div style="position: absolute; width: 140px; height: 140px; border: 3px solid #fff; border-radius: 18px; font-size: 75px; font-weight: bold; display: flex; justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 25px rgba(0,0,0,0.4); transform: rotateY(0deg) translateZ(70px); background: #ff4b4b;">⚀</div>
-                <div style="position: absolute; width: 140px; height: 140px; border: 3px solid #fff; border-radius: 18px; font-size: 75px; font-weight: bold; display: flex; justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 25px rgba(0,0,0,0.4); transform: rotateX(-90deg) translateZ(70px); background: #3b82f6;">⚁</div>
-                <div style="position: absolute; width: 140px; height: 140px; border: 3px solid #fff; border-radius: 18px; font-size: 75px; font-weight: bold; display: flex; justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 25px rgba(0,0,0,0.4); transform: rotateY(90deg) translateZ(70px); background: #10b981;">⚂</div>
-                <div style="position: absolute; width: 140px; height: 140px; border: 3px solid #fff; border-radius: 18px; font-size: 75px; font-weight: bold; display: flex; justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 25px rgba(0,0,0,0.4); transform: rotateY(-90deg) translateZ(70px); background: #f59e0b;">⚃</div>
-                <div style="position: absolute; width: 140px; height: 140px; border: 3px solid #fff; border-radius: 18px; font-size: 75px; font-weight: bold; display: flex; justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 25px rgba(0,0,0,0.4); transform: rotateX(90deg) translateZ(70px); background: #8b5cf6;">⚄</div>
-                <div style="position: absolute; width: 140px; height: 140px; border: 3px solid #fff; border-radius: 18px; font-size: 75px; font-weight: bold; display: flex; justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 25px rgba(0,0,0,0.4); transform: rotateY(180deg) translateZ(70px); background: #d97706;">⚅</div>
-            </div>
+    <!-- 🏆 لوحة معلومات البطل والمهام -->
+    <div style="display: flex; justify-content: space-between; width: 100%; max-width: 450px; background: #4E3629; color: white; padding: 15px; border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.2); margin-bottom: 15px;">
+        <div>
+            <h3 style="margin: 0; color: #f59e0b;">👤 البطل: آدم</h3>
+            <p style="margin: 5px 0 0 0;">⭐ المستوى: <span id="hero-level">1</span></p>
+            <p style="margin: 5px 0 0 0;">💰 الذهب: <span id="hero-gold" style="color: #f59e0b; font-weight: bold;">0</span></p>
+        </div>
+        <div style="text-align: left; border-right: 2px solid #D4A373; padding-right: 15px;">
+            <h4 style="margin: 0; color: #10b981;">📜 المهمة الحالية:</h4>
+            <p id="quest-text" style="margin: 5px 0 0 0; font-size: 14px;">هزم 3 ديال وحوش الغابة!</p>
+            <p style="margin: 5px 0 0 0; font-size: 13px; color: #a7f3d0;">التقدم: <span id="quest-progress">0</span> / 3</p>
         </div>
     </div>
 
-    <!-- 📊 عداد النقاط الذكي سرييييع جداً وبدون لاغ -->
-    <div style="margin-top: 20px; text-align: center; color: #3D3025; direction: rtl;">
-        <h3 id="result-text" style="margin: 5px 0; color: #10b981; display: none;">🎉 جالي الرقم: <span id="current-dice">0</span></h3>
-        <h2 style="margin: 10px 0;">📊 حصيلتك الحالية: <span id="total-score" style="color: #ff4b4b;">0</span> نقطة (في <span id="roll-count" style="color: #3b82f6;">0</span> رمية)</h2>
-        <button onclick="resetScore()" style="background-color: #3D3025; color: white; border: none; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: bold;">🔄 إعادة تصفير النقاط</button>
+    <!-- 🎮 ساحة المعركة والمضاربة -->
+    <div style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 450px; height: 300px; background: #2b1d16; border-radius: 20px; border: 4px solid #4E3629; box-shadow: 0 12px 24px rgba(0,0,0,0.3); overflow: hidden;">
+        
+        <!-- طاقة الوحش -->
+        <div style="width: 80%; background: #555; border-radius: 10px; height: 15px; margin-bottom: 10px; position: relative;">
+            <div id="enemy-hp-bar" style="width: 100%; background: #ff4b4b; height: 100%; border-radius: 10px; transition: width 0.2s;"></div>
+            <span id="enemy-hp-text" style="position: absolute; width: 100%; text-align: center; font-size: 11px; color: white; font-weight: bold; top: 0;">HP: 100/100</span>
+        </div>
+        
+        <!-- اسم وصورة الوحش الافتراضية -->
+        <h3 id="enemy-name" style="color: #ff4b4b; margin: 5px 0;">👹 وحش الغابة الأخضر</h3>
+        <div id="enemy-sprite" style="font-size: 80px; margin: 20px 0; transition: transform 0.1s; user-select: none;">👹</div>
+        
+        <!-- نص الضربات المتطاير -->
+        <div id="damage-pop" style="position: absolute; color: #ffeb3b; font-size: 30px; font-weight: bold; display: none; text-shadow: 2px 2px #000;">💥 -25</div>
     </div>
 
-    <!-- 📸 إعلان إنستغرام الذكي (كيظهر فكل 5 رميات تلقائياً بلا ريفريش) -->
+    <!-- 🕹️ أزرار الهجوم والمضاربة السريعة -->
+    <div style="margin-top: 15px; display: flex; gap: 10px; width: 100%; max-width: 450px;">
+        <button onclick="attack(20, 'سريع')" style="flex: 1; background: #ff4b4b; color: white; border: none; padding: 12px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px #b91c1c;">⚔️ هجوم سريع</button>
+        <button onclick="attack(45, 'قوي')" style="flex: 1; background: #d97706; color: white; border: none; padding: 12px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px #b45309;">💥 ضربة قاضية</button>
+    </div>
+
+    <button onclick="resetGame()" style="margin-top: 15px; background: transparent; color: #3D3025; border: 1px solid #3D3025; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px;">🔄 إعادة بدء المغامرة</button>
+
+    <!-- 📸 إعلان إنستغرام الذكي عند إكمال المهام -->
     <div id="insta-ad" style="display: none; background-color: #FFFFFF; padding: 15px; border-radius: 15px; border-left: 5px solid #E1306C; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05); margin-top: 15px; width: 90%;">
-        <p style="font-size: 14px; margin: 0; color:#333;">📸 تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p>
+        <p style="font-size: 14px; margin: 0; color:#333;">📸 كملتي المهمة بنجاح! تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p>
         <a href="https://instagram.com" target="_blank" style="background-color: #E1306C; color: white; padding: 5px 10px; text-decoration: none; border-radius: 15px; font-size: 12px; display: inline-block; margin-top: 5px;">اضغط للمتابعة</a>
     </div>
 
     <script>
-        let totalScore = 0;
-        let rollCount = 0;
+        // إعدادات اللعبة الداخلية فـ JavaScript
+        let heroLevel = 1;
+        let heroGold = 0;
+        let monstersDefeated = 0;
+        let questTarget = 3;
+        
+        let enemyMaxHp = 100;
+        let enemyHp = 100;
+        let isAttacking = false;
+        
+        const monsters = [
+            {{ name: "👹 وحش الغابة الأخضر", sprite: "👹", hp: 100, gold: 20 }},
+            {{ name: "🐉 التنين الصخري الأسود", sprite: "🐉", hp: 180, gold: 50 }},
+            {{ name: "🤖 الآلي المقاتل المدمر", sprite: "🤖", hp: 250, gold: 90 }}
+        ];
+        let currentMonsterIndex = 0;
 
-        function rollDice() {{
-            const cube = document.getElementById('dice');
-            const result = Math.floor(Math.random() * 6) + 1;
+        function attack(maxDmg, type) {{
+            if (enemyHp <= 0 || isAttacking) return;
+            isAttacking = true;
             
-            const xRand = (Math.floor(Math.random() * 3) + 4) * 360;
-            const yRand = (Math.floor(Math.random() * 3) + 4) * 360;
+            // حساب قوة الضربة العشوائية
+            let dmg = Math.floor(Math.random() * 15) + (maxDmg - 10);
+            enemyHp -= dmg;
+            if (enemyHp < 0) enemyHp = 0;
             
-            const angles = {{
-                1: `rotateX(${{xRand}}deg) rotateY(${{yRand}}deg)`,
-                2: `rotateX(${{xRand - 90}}deg) rotateY(${{yRand}}deg)`,
-                3: `rotateX(${{xRand}}deg) rotateY(${{yRand + 90}}deg)`,
-                4: `rotateX(${{xRand}}deg) rotateY(${{yRand - 90}}deg)`,
-                5: `rotateX(${{xRand + 90}}deg) rotateY(${{yRand}}deg)`,
-                6: `rotateX(${{xRand + 180}}deg) rotateY(${{yRand}}deg)`
-            }};
+            // تحديث شريط الطاقة للوحش
+            let hpPercent = (enemyHp / enemyMaxHp) * 100;
+            document.getElementById('enemy-hp-bar').style.width = hpPercent + '%';
+            document.getElementById('enemy-hp-text').innerText = `HP: ${{enemyHp}}/${{enemyMaxHp}}`;
             
-            cube.style.transform = angles[result];
+            // حركة اهتزاز الوحش عند تلقي الضربة
+            const sprite = document.getElementById('enemy-sprite');
+            sprite.style.transform = "scale(0.8) rotate(10deg)";
             
-            // تحديث الحسابات فورا بعد 800 مللي ثانية (قبل ما تسالي الدورة بشوية لسرعة خيالية)
+            // إظهار الرقم ديال الضربة المتطاير
+            const pop = document.getElementById('damage-pop');
+            pop.innerText = `💥 -${{dmg}}`;
+            pop.style.display = 'block';
+            
             setTimeout(() => {{
-                rollCount++;
-                totalScore += result;
+                sprite.style.transform = "scale(1) rotate(0deg)";
+                pop.style.display = 'none';
+                isAttacking = false;
                 
-                document.getElementById('current-dice').innerText = result;
-                document.getElementById('result-text').style.display = 'block';
-                document.getElementById('total-score').innerText = totalScore;
-                document.getElementById('roll-count').innerText = rollCount;
-                
-                // إظهار إعلان الإنستغرام كل 5 رميات
-                if(rollCount % 5 === 0) {{
-                    document.getElementById('insta-ad').style.display = 'block';
-                }} else {{
-                    document.getElementById('insta-ad').style.display = 'none';
+                // التأكد واش الوحش مات
+                if (enemyHp <= 0) {{
+                    monsterDied();
                 }}
-            }}, 800);
+            }}, 200);
         }}
 
-        function resetScore() {{
-            totalScore = 0;
-            rollCount = 0;
-            document.getElementById('total-score').innerText = totalScore;
-            document.getElementById('roll-count').innerText = rollCount;
-            document.getElementById('result-text').style.display = 'none';
+        function monsterDied() {{
+            // ربح الذهب
+            let goldEarned = monsters[currentMonsterIndex].gold;
+            heroGold += goldEarned;
+            monstersDefeated++;
+            
+            document.getElementById('hero-gold').innerText = heroGold;
+            
+            // تحديث تقدم المهمة
+            if (monstersDefeated <= questTarget) {{
+                document.getElementById('quest-progress').innerText = monstersDefeated;
+            }}
+            
+            // التحقق من إكمال المهمة الأولى
+            if (monstersDefeated === questTarget) {{
+                heroLevel++;
+                document.getElementById('hero-level').innerText = heroLevel;
+                document.getElementById('insta-ad').style.display = 'block';
+                document.getElementById('quest-text').innerText = "تمت المهمة! تابع القتال الحر!";
+            }}
+            
+            // الانتقال للوحش التالي أو زيادة طاقته
+            currentMonsterIndex = (currentMonsterIndex + 1) % monsters.length;
+            if (heroLevel > 1) {{
+                enemyMaxHp = monsters[currentMonsterIndex].hp + (heroLevel * 20);
+            }} else {{
+                enemyMaxHp = monsters[currentMonsterIndex].hp;
+            }}
+            
+            enemyHp = enemyMaxHp;
+            
+            // تحديث واجهة الوحش الجديد
+            setTimeout(() => {{
+                document.getElementById('enemy-name').innerText = monsters[currentMonsterIndex].name;
+                document.getElementById('enemy-sprite').innerText = monsters[currentMonsterIndex].sprite;
+                document.getElementById('enemy-hp-bar').style.width = '100%';
+                document.getElementById('enemy-hp-text').innerText = `HP: ${{enemyHp}}/${{enemyMaxHp}}`;
+            }}, 500);
+        }}
+
+        function resetGame() {{
+            heroLevel = 1;
+            heroGold = 0;
+            monstersDefeated = 0;
+            currentMonsterIndex = 0;
+            enemyMaxHp = 100;
+            enemyHp = 100;
+            
+            document.getElementById('hero-level').innerText = heroLevel;
+            document.getElementById('hero-gold').innerText = heroGold;
+            document.getElementById('quest-progress').innerText = 0;
+            document.getElementById('quest-text').innerText = "هزم 3 ديال وحوش الغابة!";
+            document.getElementById('enemy-name').innerText = monsters[0].name;
+            document.getElementById('enemy-sprite').innerText = monsters[0].sprite;
+            document.getElementById('enemy-hp-bar').style.width = '100%';
+            document.getElementById('enemy-hp-text').innerText = `HP: 100/100`;
             document.getElementById('insta-ad').style.display = 'none';
         }}
     </script>
 </div>
 """
 
-# عرض اللعبة الكاملة فالموقع
-components.html(html_code, height=520)
+# عرض اللعبة بالكامل داخل الموقع
+components.html(html_code, height=560)
 
-# --- 💰 مساحة إعلان Start.io للويب المستقرة فمكانها ---
+# --- 💰 مساحة إعلان Start.io للويب عشان تجمع الأرباح ---
 st.markdown("---")
 st.write("📢 **إشهار لدعم المبرمج الصغير:**")
 
 startio_ad_html = f"""
 <div style="display: flex; justify-content: center; align-items: center; min-height: 100px;">
-    <script type="text/javascript" src="https://start.io"></script>
-    <script type="text/javascript">
-        startio.init("{STARTIO_ACCOUNT_ID}");
-        startio.createBanner({{
-            container: document.body,
-            width: 320,
-            height: 50
-        }});
-    </script>
-</div>
-"""
-components.html(startio_ad_html, height=120)
