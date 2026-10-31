@@ -5,9 +5,9 @@ import os
 import streamlit.components.v1 as components
 
 # إعداد الصفحة وتزيينها
-st.set_page_config(page_title="لعبة النرد 3D الذكية", page_icon="🎲", layout="centered")
-st.title("🎲 تحدي لعبة النرد ثلاثية الأبعاد (3D)!")
-st.write("أنا مبرمج وعندي 10 سنوات، صاوبت هاد النرد 3D باش نتحداكم فزهركم!")
+st.set_page_config(page_title="لعبة النرد 3D الملونة", page_icon="🎲", layout="centered")
+st.title("🎲 تحدي لعبة النرد 3D الملونة!")
+st.write("أنا مبرمج وعندي 10 سنوات، صاوبت هاد النرد 3D الملون باش نتحداكم!")
 
 LEADERBOARD_FILE = "leaderboard.txt"
 
@@ -19,13 +19,13 @@ def قراءة_المتصدرين():
                 if "," in line:
                     name, score = line.strip().split(",")
                     scores.append((name, int(score)))
-    scores.sort(key=lambda x: x[1], reverse=True)
+    scores.sort(key=lambda x: x, reverse=True)
     return scores[:5]
 
 def حفظ_متصدر_جديد(name, score):
     scores = قراءة_المتصدرين()
     scores.append((name, score))
-    scores.sort(key=lambda x: x[1], reverse=True)
+    scores.sort(key=lambda x: x, reverse=True)
     scores = scores[:5]
     with open(LEADERBOARD_FILE, "w", encoding="utf-8") as f:
         for n, s in scores:
@@ -46,7 +46,7 @@ if 'دور_النرد' not in st.session_state:
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("🎲 ارمي النرد 3D دابا! 🎲"):
+    if st.button("🎲 ارمي النرد 3D الملون! 🎲"):
         st.session_state.عدد_التدويرات += 1
         st.session_state.الرقم_الحالي = random.randint(1, 6)
         st.session_state.مجموع_النقاط += st.session_state.الرقم_الحالي
@@ -63,8 +63,7 @@ with col2:
         else:
             st.warning("خاصك تلعب وترمي النرد أولاً! 🎲")
 
-# --- 🎮 كود الـ 3D الحقيقي (HTML & CSS & JS) ---
-# زوايا الدوران الخاصة بكل وجه من أوجه النرد
+# --- 🎮 كود الـ 3D الملون (كل وجه بلون مميز) ---
 زوايا_النرد = {
     1: "rotateX(0deg) rotateY(0deg)",
     2: "rotateX(-90deg) rotateY(0deg)",
@@ -76,9 +75,6 @@ with col2:
 
 الزاوية_المستهدفة = زوايا_النرد[st.session_state.الرقم_الحالي]
 
-# إذا ضغط اللاعب على الزر، النرد كيدير حركة الدوران العشوائية القوية قبل ما يقف
-حركة_الدوران = "animation: spin 1.5s ease-out forward;" if st.session_state.دور_النرد else ""
-
 html_code = f"""
 <div style="display: flex; justify-content: center; align-items: center; height: 220px; background: #0e1117; border-radius: 15px;">
     <style>
@@ -89,16 +85,18 @@ html_code = f"""
             {f"animation: roll 1.2s ease-out forwards;" if st.session_state.دور_النرد else ""}
         }}
         .face {{
-            position: absolute; width: 100px; height: 100px; background: white; border: 3px solid #333;
-            border-radius: 10px; font-size: 50px; font-weight: bold; display: flex;
-            justify-content: center; align-items: center; color: #1e1e1e; box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+            position: absolute; width: 100px; height: 100px; border: 2px solid #fff;
+            border-radius: 12px; font-size: 55px; font-weight: bold; display: flex;
+            justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
         }}
-        .front  {{ transform: rotateY(  0deg) translateZ(50px); }}
-        .back   {{ transform: rotateY(180deg) translateZ(50px); }}
-        .right  {{ transform: rotateY( 90deg) translateZ(50px); }}
-        .left   {{ transform: rotateY(-90deg) translateZ(50px); }}
-        .top    {{ transform: rotateX( 90deg) translateZ(50px); }}
-        .bottom {{ transform: rotateX(-90deg) translateZ(50px); }}
+        
+        /* 🎨 هنا حددنا لون مخصص ومميز لكل نرد (وجه) */
+        .front  {{ transform: rotateY(  0deg) translateZ(50px); background: #ff4b4b; }} /* أحمر */
+        .bottom {{ transform: rotateX(-90deg) translateZ(50px); background: #3b82f6; }} /* أزرق */
+        .right  {{ transform: rotateY( 90deg) translateZ(50px); background: #10b981; }} /* أخضر */
+        .left   {{ transform: rotateY(-90deg) translateZ(50px); background: #f59e0b; }} /* برتقالي */
+        .top    {{ transform: rotateX( 90deg) translateZ(50px); background: #8b5cf6; }} /* بنفسجي */
+        .back   {{ transform: rotateY(180deg) translateZ(50px); background: #d97706; }} /* ذهبي بني */
         
         @keyframes roll {{
             0% {{ transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }}
@@ -110,22 +108,20 @@ html_code = f"""
     <div class="scene">
         <div class="cube">
             <div class="face front">⚀</div>
-            <div class="face back">⚅</div>
+            <div class="face bottom">⚁</div>
             <div class="face right">⚂</div>
             <div class="face left">⚃</div>
             <div class="face top">⚄</div>
-            <div class="face bottom">⚁</div>
+            <div class="face back">⚅</div>
         </div>
     </div>
 </div>
 """
 
-# عرض النرد ثلاثي الأبعاد داخل الموقع
 components.html(html_code, height=230)
 
-# عرض النتيجة واللوحة
 if st.session_state.دور_النرد:
-    st.success(f"🎉 النرد 3D وقف وجاب ليك الرقم: {st.session_state.الرقم_الحالي}")
+    st.success(f"🎉 النرد الملون وقف وجاب ليك الرقم: {st.session_state.الرقم_الحالي}")
     if st.session_state.عدد_التدويرات % 5 == 0:
         st.balloons()
         st.markdown('<div style="background-color: #f0f2f6; padding: 15px; border-radius: 15px; border-left: 5px solid #E1306C; text-align: center;"><p style="font-size: 14px; margin: 0;">📸 تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p><a href="https://instagram.com" target="_blank" style="background-color: #E1306C; color: white; padding: 5px 10px; text-decoration: none; border-radius: 15px; font-size: 12px; display: inline-block; margin-top: 5px;">اضغط للمتابعة</a></div>', unsafe_allow_html=True)
