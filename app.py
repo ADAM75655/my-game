@@ -6,6 +6,9 @@ import streamlit.components.v1 as components
 # إعداد الصفحة
 st.set_page_config(page_title="لعبة النرد 3D التفاعلية", page_icon="🎲", layout="centered")
 
+# 🌟 معرف حساب Start.io الحقيقي ديال آدم البطل
+STARTIO_ACCOUNT_ID = "124299136"
+
 # تغيير لون الشاشة للون سومو فاتح
 st.markdown("""
     <style>
@@ -18,7 +21,7 @@ st.markdown("""
 st.title("🎲 تحدي لعبة النرد 3D التفاعلية!")
 st.write("✨ اضغط ديريكت على النرد وسط المربع الكبير باش يدور ويتبدل!")
 
-# إعداد الذاكرة لحساب الجولة الحالية فقط
+# إعداد الذاكرة
 if 'عدد_التدويرات' not in st.session_state: st.session_state.عدد_التدويرات = 0
 if 'مجموع_النقاط' not in st.session_state: st.session_state.مجموع_النقاط = 0
 
@@ -34,7 +37,6 @@ if "dice_result" in query_params:
         st.session_state.last_roll_id = query_params.get("roll_id")
         st.session_state.الرقم_الأخير = res
 
-# زر صغير لإعادة تصفير العداد الحالي إذا بغيتي تبدا من جديد
 if st.button("🔄 إعادة تصفير النقاط"):
     st.session_state.عدد_التدويرات = 0
     st.session_state.مجموع_النقاط = 0
@@ -117,3 +119,22 @@ if "الرقم_الأخير" in st.session_state:
         st.markdown('<div style="background-color: #FFFFFF; padding: 15px; border-radius: 15px; border-left: 5px solid #E1306C; text-align: center;"><p style="font-size: 14px; margin: 0; color:#333;">📸 تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p><a href="https://instagram.com" target="_blank" style="background-color: #E1306C; color: white !important; padding: 5px 10px; text-decoration: none; border-radius: 15px; font-size: 12px; display: inline-block; margin-top: 5px;">اضغط للمتابعة</a></div>', unsafe_allow_html=True)
 
 st.subheader(f"📊 حصيلتك الحالية: {st.session_state.مجموع_النقاط} نقطة (في {st.session_state.عدد_التدويرات} رمية)")
+
+# --- 💰 مساحة إعلان Start.io للويب مدمجة بذكاء ---
+st.markdown("---")
+st.write("📢 **إشهار لدعم المبرمج الصغير:**")
+
+startio_ad_html = f"""
+<div style="display: flex; justify-content: center; align-items: center; min-height: 100px;">
+    <script type="text/javascript" src="https://start.io"></script>
+    <script type="text/javascript">
+        startio.init("{STARTIO_ACCOUNT_ID}");
+        startio.createBanner({{
+            container: document.body,
+            width: 320,
+            height: 50
+        }});
+    </script>
+</div>
+"""
+components.html(startio_ad_html, height=120)
