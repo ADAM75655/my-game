@@ -6,6 +6,24 @@ import streamlit.components.v1 as components
 
 # إعداد الصفحة وتزيينها
 st.set_page_config(page_title="لعبة النرد 3D الملونة", page_icon="🎲", layout="centered")
+
+# 🌟 تغيير لون الشاشة كاملة للون سومو فاتح (Sumo Light) وتعديل لون النصوص للون داكن باش تبان واضحة
+st.markdown("""
+    <style>
+        .stApp {
+            background-color: #FAEDCD !important; /* لون سومو فاتح وهادئ */
+        }
+        h1, h2, h3, p, label, .stMarkdown {
+            color: #3D3025 !important; /* لون بني داكن متناسق مع السومو ومريح للعين */
+        }
+        .stTextInput input {
+            background-color: #FFFFFF !important;
+            color: #3D3025 !important;
+            border: 2px solid #D4A373 !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("🎲 تحدي لعبة النرد 3D الملونة!")
 st.write("أنا مبرمج وعندي 10 سنوات، صاوبت هاد النرد 3D الملون باش نتحداكم!")
 
@@ -19,13 +37,13 @@ def قراءة_المتصدرين():
                 if "," in line:
                     name, score = line.strip().split(",")
                     scores.append((name, int(score)))
-    scores.sort(key=lambda x: x, reverse=True)
+    scores.sort(key=lambda x: x[1], reverse=True)
     return scores[:5]
 
 def حفظ_متصدر_جديد(name, score):
     scores = قراءة_المتصدرين()
     scores.append((name, score))
-    scores.sort(key=lambda x: x, reverse=True)
+    scores.sort(key=lambda x: x[1], reverse=True)
     scores = scores[:5]
     with open(LEADERBOARD_FILE, "w", encoding="utf-8") as f:
         for n, s in scores:
@@ -63,7 +81,7 @@ with col2:
         else:
             st.warning("خاصك تلعب وترمي النرد أولاً! 🎲")
 
-# --- 🎮 كود الـ 3D الملون (كل وجه بلون مميز) ---
+# --- 🎮 كود الـ 3D الملون مع خلفية متناسقة ---
 زوايا_النرد = {
     1: "rotateX(0deg) rotateY(0deg)",
     2: "rotateX(-90deg) rotateY(0deg)",
@@ -76,7 +94,7 @@ with col2:
 الزاوية_المستهدفة = زوايا_النرد[st.session_state.الرقم_الحالي]
 
 html_code = f"""
-<div style="display: flex; justify-content: center; align-items: center; height: 220px; background: #0e1117; border-radius: 15px;">
+<div style="display: flex; justify-content: center; align-items: center; height: 220px; background: #3D3025; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.15);">
     <style>
         .scene {{ width: 100px; height: 100px; perspective: 400px; }}
         .cube {{
@@ -90,13 +108,12 @@ html_code = f"""
             justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
         }}
         
-        /* 🎨 هنا حددنا لون مخصص ومميز لكل نرد (وجه) */
-        .front  {{ transform: rotateY(  0deg) translateZ(50px); background: #ff4b4b; }} /* أحمر */
-        .bottom {{ transform: rotateX(-90deg) translateZ(50px); background: #3b82f6; }} /* أزرق */
-        .right  {{ transform: rotateY( 90deg) translateZ(50px); background: #10b981; }} /* أخضر */
-        .left   {{ transform: rotateY(-90deg) translateZ(50px); background: #f59e0b; }} /* برتقالي */
-        .top    {{ transform: rotateX( 90deg) translateZ(50px); background: #8b5cf6; }} /* بنفسجي */
-        .back   {{ transform: rotateY(180deg) translateZ(50px); background: #d97706; }} /* ذهبي بني */
+        .front  {{ transform: rotateY(  0deg) translateZ(50px); background: #ff4b4b; }}
+        .bottom {{ transform: rotateX(-90deg) translateZ(50px); background: #3b82f6; }}
+        .right  {{ transform: rotateY( 90deg) translateZ(50px); background: #10b981; }}
+        .left   {{ transform: rotateY(-90deg) translateZ(50px); background: #f59e0b; }}
+        .top    {{ transform: rotateX( 90deg) translateZ(50px); background: #8b5cf6; }}
+        .back   {{ transform: rotateY(180deg) translateZ(50px); background: #d97706; }}
         
         @keyframes roll {{
             0% {{ transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }}
@@ -124,7 +141,7 @@ if st.session_state.دور_النرد:
     st.success(f"🎉 النرد الملون وقف وجاب ليك الرقم: {st.session_state.الرقم_الحالي}")
     if st.session_state.عدد_التدويرات % 5 == 0:
         st.balloons()
-        st.markdown('<div style="background-color: #f0f2f6; padding: 15px; border-radius: 15px; border-left: 5px solid #E1306C; text-align: center;"><p style="font-size: 14px; margin: 0;">📸 تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p><a href="https://instagram.com" target="_blank" style="background-color: #E1306C; color: white; padding: 5px 10px; text-decoration: none; border-radius: 15px; font-size: 12px; display: inline-block; margin-top: 5px;">اضغط للمتابعة</a></div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #FFFFFF; padding: 15px; border-radius: 15px; border-left: 5px solid #E1306C; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05);"><p style="font-size: 14px; margin: 0; color: #333 !important;">📸 تابعنا في إنستغرام <strong style="color: #E1306C;">oughilas</strong> لتتوصل بالجديد! 🚀</p><a href="https://instagram.com" target="_blank" style="background-color: #E1306C; color: white !important; padding: 5px 10px; text-decoration: none; border-radius: 15px; font-size: 12px; display: inline-block; margin-top: 5px;">اضغط للمتابعة</a></div>', unsafe_allow_html=True)
 
 st.subheader(f"📊 حصيلتك الحالية: {st.session_state.مجموع_النقاط} نقطة (في {st.session_state.عدد_التدويرات} رمية)")
 
