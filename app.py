@@ -17,7 +17,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🎲 تحدي لعبة النرد 3D التفاعلية!")
-st.write("✨ **ميزة جديدة:** اضغط ديريكت على النرد وسط المربع باش يدور ويتبدل! 👋")
+st.write("✨ **ميزة جديدة:** اضغط ديريكت على النرد وسط المربع الكبير باش يدور ويتبدل! 👋")
 
 LEADERBOARD_FILE = "leaderboard.txt"
 
@@ -29,13 +29,13 @@ def قراءة_المتصدرين():
                 if "," in line:
                     name, score = line.strip().split(",")
                     scores.append((name, int(score)))
-    scores.sort(key=lambda x: x[1], reverse=True)
+    scores.sort(key=lambda x: x, reverse=True)
     return scores[:5]
 
 def حفظ_متصدر_جديد(name, score):
     scores = قراءة_المتصدرين()
     scores.append((name, score))
-    scores.sort(key=lambda x: x[1], reverse=True)
+    scores.sort(key=lambda x: x, reverse=True)
     scores = scores[:5]
     with open(LEADERBOARD_FILE, "w", encoding="utf-8") as f:
         for n, s in scores:
@@ -51,7 +51,6 @@ if 'مجموع_النقاط' not in st.session_state: st.session_state.مجمو�
 query_params = st.query_params
 if "dice_result" in query_params:
     res = int(query_params["dice_result"])
-    # التأكد أن النتيجة جديدة باش ما تبقاش تعاود مع الـ Refresh
     if "last_total" not in st.session_state or query_params.get("roll_id") != st.session_state.get("last_roll_id"):
         st.session_state.عدد_التدويرات += 1
         st.session_state.مجموع_النقاط += res
@@ -69,29 +68,29 @@ if st.button("💾 حفظ نتيجتي فلوحة المتصدرين"):
     else:
         st.warning("خاصك تضغط على النرد وتلعب أولاً! 🎲")
 
-# --- 🎮 كود الـ 3D التفاعلي بالضغط المباشر ---
-# كود HTML و JavaScript كيعتمد على الضغط ديريكت وكيرسل النتيجة لـ Streamlit
+# --- 🎮 كود الـ 3D التفاعلي بالإطار الكبير واللون الجديد ---
+# زدت فالعلو لـ 320px وبدلت لون الخلفية للون بني شوكولاتة داكن ودافئ (#4E3629) وكبرت المساحة الداخلية لراحة النرد
 roll_id = random.randint(1000, 9999)
 html_code = f"""
-<div style="display: flex; justify-content: center; align-items: center; height: 220px; background: #3D3025; border-radius: 15px; cursor: pointer;" onclick="rollDice()">
+<div style="display: flex; justify-content: center; align-items: center; height: 320px; background: #4E3629; border-radius: 20px; cursor: pointer; box-shadow: 0 12px 24px rgba(0,0,0,0.25);" onclick="rollDice()">
     <style>
-        .scene {{ width: 100px; height: 100px; perspective: 400px; }}
+        .scene {{ width: 140px; height: 140px; perspective: 600px; }}
         .cube {{
             width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
             transition: transform 1s ease-out;
             transform: rotateX(0deg) rotateY(0deg);
         }}
         .face {{
-            position: absolute; width: 100px; height: 100px; border: 2px solid #fff;
-            border-radius: 12px; font-size: 55px; font-weight: bold; display: flex;
-            justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+            position: absolute; width: 140px; height: 140px; border: 3px solid #fff;
+            border-radius: 18px; font-size: 75px; font-weight: bold; display: flex;
+            justify-content: center; align-items: center; color: white; box-shadow: inset 0 0 25px rgba(0,0,0,0.4);
         }}
-        .front  {{ transform: rotateY(  0deg) translateZ(50px); background: #ff4b4b; }}
-        .bottom {{ transform: rotateX(-90deg) translateZ(50px); background: #3b82f6; }}
-        .right  {{ transform: rotateY( 90deg) translateZ(50px); background: #10b981; }}
-        .left   {{ transform: rotateY(-90deg) translateZ(50px); background: #f59e0b; }}
-        .top    {{ transform: rotateX( 90deg) translateZ(50px); background: #8b5cf6; }}
-        .back   {{ transform: rotateY(180deg) translateZ(50px); background: #d97706; }}
+        .front  {{ transform: rotateY(  0deg) translateZ(70px); background: #ff4b4b; }}
+        .bottom {{ transform: rotateX(-90deg) translateZ(70px); background: #3b82f6; }}
+        .right  {{ transform: rotateY( 90deg) translateZ(70px); background: #10b981; }}
+        .left   {{ transform: rotateY(-90deg) translateZ(70px); background: #f59e0b; }}
+        .top    {{ transform: rotateX( 90deg) translateZ(70px); background: #8b5cf6; }}
+        .back   {{ transform: rotateY(180deg) translateZ(70px); background: #d97706; }}
     </style>
     
     <div class="scene">
@@ -110,7 +109,6 @@ html_code = f"""
             const cube = document.getElementById('dice');
             const result = Math.floor(Math.random() * 6) + 1;
             
-            // زوايا عشوائية قوية للحركة 3D
             const xRand = (Math.floor(Math.random() * 3) + 4) * 360;
             const yRand = (Math.floor(Math.random() * 3) + 4) * 360;
             
@@ -125,13 +123,11 @@ html_code = f"""
             
             cube.style.transform = زوايا[result];
             
-            // إرسال النتيجة لـ Streamlit بعد ما تسالي الحركة
             setTimeout(() => {{
                 window.parent.postMessage({{
                     type: 'streamlit:set_query_params',
                     value: {{ dice_result: result, roll_id: '{roll_id}' }}
                 }}, '*');
-                // إعادة تحميل الصفحة لتحديث السكور في بايثون
                 window.parent.location.reload();
             }}, 1000);
         }}
@@ -139,7 +135,8 @@ html_code = f"""
 </div>
 """
 
-components.html(html_code, height=230)
+# زدت فالعلو ديال الـ component باش يتناسب مع حجم الإطار الجديد
+components.html(html_code, height=335)
 
 # عرض النتيجة
 if "الرقم_الأخير" in st.session_state:
