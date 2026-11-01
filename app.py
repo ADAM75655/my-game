@@ -18,8 +18,8 @@ st.markdown("""
 st.title("⚔️ لعبة ملاحم الأبطال: قتال ومهام! ⚔️")
 st.write("✨ **تحديث جديد:** اضغط على أزرار الهجوم لضرب الوحوش، كمل المهام، واجمع الذهب! 🚀")
 
-# كود اللعبة كامل بـ HTML + CSS + JS باش تخدم اللعبة خفيفة وبلا ريفريش للصفحة
-html_code = f"""
+# كود اللعبة كامل بـ HTML + CSS + JS لتفادي مشاكل f-string فبايثون
+html_code = """
 <div style="font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; background: #FAEDCD; padding: 10px; border-radius: 15px; direction: rtl;">
     
     <!-- 🏆 لوحة معلومات البطل والمهام -->
@@ -68,7 +68,6 @@ html_code = f"""
     </div>
 
     <script>
-        // إعدادات اللعبة الداخلية فـ JavaScript
         let heroLevel = 1;
         let heroGold = 0;
         let monstersDefeated = 0;
@@ -79,88 +78,77 @@ html_code = f"""
         let isAttacking = false;
         
         const monsters = [
-            {{ name: "👹 وحش الغابة الأخضر", sprite: "👹", hp: 100, gold: 20 }},
-            {{ name: "🐉 التنين الصخري الأسود", sprite: "🐉", hp: 180, gold: 50 }},
-            {{ name: "🤖 الآلي المقاتل المدمر", sprite: "🤖", hp: 250, gold: 90 }}
+            { name: "👹 وحش الغابة الأخضر", sprite: "👹", hp: 100, gold: 20 },
+            { name: "🐉 التنين الصخري الأسود", sprite: "🐉", hp: 180, gold: 50 },
+            { name: "🤖 الآلي المقاتل المدمر", sprite: "🤖", hp: 250, gold: 90 }
         ];
         let currentMonsterIndex = 0;
 
-        function attack(maxDmg, type) {{
+        function attack(maxDmg, type) {
             if (enemyHp <= 0 || isAttacking) return;
             isAttacking = true;
             
-            // حساب قوة الضربة العشوائية
             let dmg = Math.floor(Math.random() * 15) + (maxDmg - 10);
             enemyHp -= dmg;
             if (enemyHp < 0) enemyHp = 0;
             
-            // تحديث شريط الطاقة للوحش
             let hpPercent = (enemyHp / enemyMaxHp) * 100;
             document.getElementById('enemy-hp-bar').style.width = hpPercent + '%';
-            document.getElementById('enemy-hp-text').innerText = `HP: ${{enemyHp}}/${{enemyMaxHp}}`;
+            document.getElementById('enemy-hp-text').innerText = 'HP: ' + enemyHp + '/' + enemyMaxHp;
             
-            // حركة اهتزاز الوحش عند تلقي الضربة
             const sprite = document.getElementById('enemy-sprite');
             sprite.style.transform = "scale(0.8) rotate(10deg)";
             
-            // إظهار الرقم ديال الضربة المتطاير
             const pop = document.getElementById('damage-pop');
-            pop.innerText = `💥 -${{dmg}}`;
+            pop.innerText = '💥 -' + dmg;
             pop.style.display = 'block';
             
-            setTimeout(() => {{
+            setTimeout(() => {
                 sprite.style.transform = "scale(1) rotate(0deg)";
                 pop.style.display = 'none';
                 isAttacking = false;
-                
-                // التأكد واش الوحش مات
-                if (enemyHp <= 0) {{
+                if (enemyHp <= 0) {
                     monsterDied();
-                }}
-            }}, 200);
-        }}
+                }
+            }, 200);
+        }
 
-        function monsterDied() {{
-            // ربح الذهب
+        function monsterDied() {
             let goldEarned = monsters[currentMonsterIndex].gold;
             heroGold += goldEarned;
             monstersDefeated++;
             
             document.getElementById('hero-gold').innerText = heroGold;
             
-            // تحديث تقدم المهمة
-            if (monstersDefeated <= questTarget) {{
+            if (monstersDefeated <= questTarget) {
                 document.getElementById('quest-progress').innerText = monstersDefeated;
-            }}
+            }
             
-            // التحقق من إكمال المهمة الأولى
-            if (monstersDefeated === questTarget) {{
+            if (monstersDefeated === questTarget) {
                 heroLevel++;
                 document.getElementById('hero-level').innerText = heroLevel;
                 document.getElementById('insta-ad').style.display = 'block';
                 document.getElementById('quest-text').innerText = "تمت المهمة! تابع القتال الحر!";
-            }}
+            }
             
-            // الانتقال للوحش التالي أو زيادة طاقته
             currentMonsterIndex = (currentMonsterIndex + 1) % monsters.length;
-            if (heroLevel > 1) {{
+            if (heroLevel > 1) {
                 enemyMaxHp = monsters[currentMonsterIndex].hp + (heroLevel * 20);
-            }} else {{
+            } else {
                 enemyMaxHp = monsters[currentMonsterIndex].hp;
-            }}
+            }
             
             enemyHp = enemyMaxHp;
             
-            // تحديث واجهة الوحش الجديد
-            setTimeout(() => {{
+            setTimeout(() => {
                 document.getElementById('enemy-name').innerText = monsters[currentMonsterIndex].name;
                 document.getElementById('enemy-sprite').innerText = monsters[currentMonsterIndex].sprite;
                 document.getElementById('enemy-hp-bar').style.width = '100%';
-                document.getElementById('enemy-hp-text').innerText = `HP: ${{enemyHp}}/${{enemyMaxHp}}`;
-            }}, 500);
-        }}
+                document.getElementById('enemy-hp-text').innerText = 'HP: ' + enemyHp + '/' + enemyMaxHp;
+            }, 500);
+        }
 
-        function resetGame() {{
+        function resetGame() {
             heroLevel = 1;
             heroGold = 0;
             monstersDefeated = 0;
@@ -175,19 +163,30 @@ html_code = f"""
             document.getElementById('enemy-name').innerText = monsters[0].name;
             document.getElementById('enemy-sprite').innerText = monsters[0].sprite;
             document.getElementById('enemy-hp-bar').style.width = '100%';
-            document.getElementById('enemy-hp-text').innerText = `HP: 100/100`;
+            document.getElementById('enemy-hp-text').innerText = 'HP: 100/100';
             document.getElementById('insta-ad').style.display = 'none';
-        }}
+        }
     </script>
 </div>
 """
 
-# عرض اللعبة بالكامل داخل الموقع
 components.html(html_code, height=560)
 
-# --- 💰 مساحة إعلان Start.io للويب عشان تجمع الأرباح ---
+# --- 💰 مساحة إعلان Start.io للويب مربوطة بالـ ID ديالك بشكل نقي ---
 st.markdown("---")
 st.write("📢 **إشهار لدعم المبرمج الصغير:**")
 
 startio_ad_html = f"""
 <div style="display: flex; justify-content: center; align-items: center; min-height: 100px;">
+    <script type="text/javascript" src="https://start.io"></script>
+    <script type="text/javascript">
+        startio.init("{STARTIO_ACCOUNT_ID}");
+        startio.createBanner({{
+            container: document.body,
+            width: 320,
+            height: 50
+        }});
+    </script>
+</div>
+"""
+components.html(startio_ad_html, height=120)
