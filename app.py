@@ -15,7 +15,7 @@ except:
     st.error("عفاك صاوب ملف سميتو game.html وحط فيه كود اللعبة!")
 
 st.markdown("---")
-st.write("📢 **إشهار لدعم المبرمج الصغير:**")
+st.write("📢 واولاد لقحإشهار لدعم المبرمج الصغير:**")
 startio_ad_html = """
 <div style="display: flex; justify-content: center; align-items: center; min-height: 100px;">
     <script type="text/javascript" src="https://start.io"></script>
